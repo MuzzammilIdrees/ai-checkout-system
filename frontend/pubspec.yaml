@@ -1,0 +1,58 @@
+name: ai_checkout_frontend
+description: AI-Powered Automatic Retail Checkout System — Flutter POS Interface
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # State Management — Riverpod 2.x
+  flutter_riverpod: ^2.4.0
+  hooks_riverpod: ^2.4.0
+
+  # HTTP Client
+  dio: ^5.3.0
+
+  # Image Picker (camera & gallery)
+  image_picker: ^1.0.4
+
+  # File Picker (import from documents)
+  file_picker: ^8.0.0
+
+  # PDF & Printing
+  printing: ^5.11.0
+  pdf: ^3.10.4
+
+  # Date/Time Formatting
+  intl: ^0.18.0
+
+  # Image Caching
+  cached_network_image: ^3.3.0
+
+  # Loading Effects
+  shimmer: ^3.0.0
+
+  # Animations
+  lottie: ^2.6.0
+
+  # Typography
+  google_fonts: ^6.1.0
+  camera: ^0.12.0+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/

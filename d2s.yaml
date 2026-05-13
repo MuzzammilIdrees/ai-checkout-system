@@ -1,0 +1,65 @@
+path: C:\Users\Muzzammil Idrees\OneDrive\Desktop\dnn project\mvtec_d2s_yolo
+train: images/train
+val: images/val
+nc: 60
+names:
+  0: adelholzener_alpenquelle_classic_075
+  1: adelholzener_alpenquelle_naturell_075
+  2: adelholzener_classic_bio_apfelschorle_02
+  3: adelholzener_classic_naturell_02
+  4: adelholzener_gourmet_mineralwasser_02
+  5: augustiner_lagerbraeu_hell_05
+  6: augustiner_weissbier_05
+  7: coca_cola_05
+  8: coca_cola_light_05
+  9: suntory_gokuri_lemonade
+  10: tegernseer_hell_03
+  11: corny_nussvoll
+  12: corny_nussvoll_single
+  13: corny_schoko_banane
+  14: corny_schoko_banane_single
+  15: dr_oetker_vitalis_knuspermuesli_klassisch
+  16: koelln_muesli_fruechte
+  17: koelln_muesli_schoko
+  18: caona_cocoa
+  19: cocoba_cocoa
+  20: cafe_wunderbar_espresso
+  21: douwe_egberts_professional_ground_coffee
+  22: gepa_bio_caffe_crema
+  23: gepa_italienischer_bio_espresso
+  24: apple_braeburn_bundle
+  25: apple_golden_delicious
+  26: apple_granny_smith
+  27: apple_red_boskoop
+  28: avocado
+  29: banana_bundle
+  30: banana_single
+  31: clementine
+  32: clementine_single
+  33: grapes_green_sugraone_seedless
+  34: grapes_sweet_celebration_seedless
+  35: kiwi
+  36: orange_single
+  37: oranges
+  38: pear
+  39: pasta_reggia_elicoidali
+  40: pasta_reggia_fusilli
+  41: pasta_reggia_spaghetti
+  42: franken_tafelreiniger
+  43: pelikan_tintenpatrone_canon
+  44: ethiquable_gruener_tee_ceylon
+  45: gepa_bio_und_fair_fencheltee
+  46: gepa_bio_und_fair_kamillentee
+  47: gepa_bio_und_fair_kraeuterteemischung
+  48: gepa_bio_und_fair_pfefferminztee
+  49: gepa_bio_und_fair_rooibostee
+  50: kilimanjaro_tea_earl_grey
+  51: cucumber
+  52: carrot
+  53: corn_salad
+  54: lettuce
+  55: vine_tomatoes
+  56: roma_vine_tomatoes
+  57: rocket
+  58: salad_iceberg
+  59: zucchini

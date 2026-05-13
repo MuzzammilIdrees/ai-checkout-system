@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Checkout System — POS Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#F5F5F5;color:#1a1a2e;overflow-x:hidden}
+.app-bar{background:#1565C0;color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.app-bar h1{font-size:18px;font-weight:800;letter-spacing:1.5px;display:flex;align-items:center;gap:10px}
+.app-bar .nav-icons{display:flex;gap:8px}
+.app-bar .nav-icons button{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:16px;transition:background .2s}
+.app-bar .nav-icons button:hover{background:rgba(255,255,255,.3)}
+.main{display:flex;height:calc(100vh - 56px)}
+.camera-section{flex:6;padding:16px;display:flex;flex-direction:column}
+.camera-box{flex:1;background:#000;border-radius:12px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.camera-placeholder{text-align:center;color:rgba(255,255,255,.4)}
+.camera-placeholder .icon{font-size:64px;margin-bottom:16px}
+.camera-placeholder p{font-size:15px;font-weight:500}
+.camera-placeholder small{font-size:12px;opacity:.6}
+.camera-controls{position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent,rgba(0,0,0,.8));display:flex;justify-content:center;gap:24px}
+.cam-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;background:none}
+.cam-btn .circle{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;transition:background .2s}
+.cam-btn:hover .circle{background:rgba(255,255,255,.3)}
+.cam-btn span{color:rgba(255,255,255,.85);font-size:11px;font-weight:500}
+.cam-btn.demo .circle{color:#FFC107}
+.cam-btn.demo span{color:#FFC107}
+.overlay-demo{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+.overlay-demo svg{width:100%;height:100%}
+.receipt-section{flex:4;display:flex;flex-direction:column;background:#fff;border-radius:20px 0 0 0;box-shadow:-2px 0 12px rgba(0,0,0,.08)}
+.receipt-header{padding:16px;background:rgba(21,101,192,.05);border-radius:20px 0 0 0;display:flex;align-items:center;gap:8px}
+.receipt-header h2{font-size:17px;font-weight:700;color:#1565C0;flex:1}
+.receipt-header .time{font-size:12px;color:#999}
+.receipt-items{flex:1;overflow-y:auto;padding:8px 0}
+.receipt-item{display:flex;align-items:flex-start;padding:10px 16px;border-bottom:1px solid #f0f0f0;animation:slideIn .4s ease-out both}
+.receipt-item:nth-child(1){animation-delay:.1s}
+.receipt-item:nth-child(2){animation-delay:.2s}
+.receipt-item:nth-child(3){animation-delay:.3s}
+.receipt-item:nth-child(4){animation-delay:.4s}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.receipt-item .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;margin-right:10px;flex-shrink:0}
+.receipt-item .info{flex:1}
+.receipt-item .info .name{font-weight:600;font-size:14px;margin-bottom:2px}
+.receipt-item .info .meta{font-size:12px;color:#888}
+.receipt-item .info .conf{font-size:11px;color:#aaa}
+.receipt-item .price{font-family:'Source Code Pro',monospace;font-weight:700;font-size:15px;color:#1565C0}
+.totals{padding:12px 16px;border-top:1px solid #ddd}
+.totals .row{display:flex;justify-content:space-between;margin-bottom:4px}
+.totals .row.label{color:#888;font-size:13px}
+.totals .row.label .val{font-family:'Source Code Pro',monospace;font-weight:500;font-size:13px;color:#333}
+.totals .row.grand{margin-top:8px}
+.totals .row.grand .lbl{font-size:20px;font-weight:800;color:#1565C0}
+.totals .row.grand .val{font-family:'Source Code Pro',monospace;font-size:24px;font-weight:800;color:#1565C0}
+.actions{padding:16px;display:flex;gap:12px}
+.btn{border:none;padding:14px 20px;border-radius:12px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-outline{background:#fff;border:2px solid #1565C0;color:#1565C0}
+.btn-outline:hover{background:rgba(21,101,192,.05)}
+.btn-scan{background:#FF6F00;color:#fff;flex:2;letter-spacing:.5px}
+.btn-scan:hover{background:#E65100;transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,111,0,.3)}
+.btn-complete{background:#2E7D32;color:#fff;flex:2}
+.btn-complete:hover{background:#1B5E20;transform:translateY(-1px)}
+.bottom-nav{display:none;background:#fff;border-top:1px solid #eee;padding:8px 0}
+.mask-label{position:absolute;background:rgba(0,0,0,.75);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;pointer-events:none}
+.warning-bar{margin:4px 16px;padding:8px 10px;background:#FFF3E0;border:1px solid #FFE0B2;border-radius:8px;display:flex;align-items:center;gap:8px;font-size:12px;color:#E65100}
+/* Inventory & History Tab styles */
+.tab-container{display:none;height:calc(100vh - 56px);flex-direction:column}
+.tab-container.active{display:flex}
+.search-bar{padding:12px;display:flex;gap:12px}
+.search-bar input{flex:1;padding:10px 16px;border:1px solid #ddd;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;background:#fff;outline:none}
+.search-bar input:focus{border-color:#1565C0;box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.search-bar select{padding:10px 12px;border:1px solid #ddd;border-radius:12px;font-family:'Inter',sans-serif;background:#fff}
+.product-list{flex:1;overflow-y:auto;padding:0 12px}
+.product-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;transition:all .2s}
+.product-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.1);transform:translateY(-1px)}
+.stock-badge{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0}
+.stock-green{background:rgba(76,175,80,.1);color:#4CAF50}
+.stock-amber{background:rgba(255,160,0,.1);color:#FFA000}
+.stock-red{background:rgba(244,67,54,.1);color:#F44336}
+.product-info{flex:1}
+.product-info .pname{font-weight:600;font-size:14px}
+.product-info .pcat{font-size:12px;color:#999;margin-top:2px}
+.product-price{font-family:'Source Code Pro',monospace;font-weight:600;font-size:16px;color:#1565C0}
+.fab{position:fixed;bottom:24px;right:24px;background:#FF6F00;color:#fff;border:none;padding:14px 24px;border-radius:16px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(255,111,0,.3);display:flex;align-items:center;gap:8px;transition:all .2s;z-index:10}
+.fab:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,111,0,.4)}
+.txn-card{background:#fff;border-radius:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.txn-header{padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer}
+.txn-icon{width:44px;height:44px;border-radius:10px;background:rgba(21,101,192,.1);display:flex;align-items:center;justify-content:center;color:#1565C0;font-size:20px}
+.txn-amount{font-family:'Source Code Pro',monospace;font-size:18px;font-weight:700;color:#1565C0}
+.txn-meta{font-size:12px;color:#888;margin-top:2px}
+.txn-meta small{font-size:11px;color:#aaa}
+</style>
+</head>
+<body>
+
+<!-- App Bar -->
+<div class="app-bar">
+  <h1>🛒 AI CHECKOUT</h1>
+  <div class="nav-icons">
+    <button onclick="showTab('checkout')" title="Checkout">🏠</button>
+    <button onclick="showTab('inventory')" title="Inventory">📦</button>
+    <button onclick="showTab('history')" title="History">📋</button>
+  </div>
+</div>
+
+<!-- CHECKOUT TAB -->
+<div class="tab-container active" id="tab-checkout">
+<div class="main">
+  <div class="camera-section">
+    <div class="camera-box" id="cameraBox">
+      <div class="camera-placeholder" id="placeholder">
+        <div class="icon">📷</div>
+        <p>Capture or select an image</p>
+        <small>Use the controls below</small>
+      </div>
+      <img id="previewImg" style="display:none;max-width:100%;max-height:100%;object-fit:contain" />
+      <div class="overlay-demo" id="overlayArea"></div>
+      <div class="camera-controls">
+        <div class="cam-btn" onclick="pickImage()">
+          <div class="circle">🖼️</div><span>Gallery</span>
+        </div>
+        <div class="cam-btn" onclick="pickImage()">
+          <div class="circle">📸</div><span>Camera</span>
+        </div>
+        <div class="cam-btn demo" onclick="loadDemo()">
+          <div class="circle">🧪</div><span>Demo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="receipt-section">
+    <div class="receipt-header">
+      <span style="font-size:20px">🧾</span>
+      <h2>Receipt</h2>
+      <span class="time" id="procTime"></span>
+    </div>
+    <div class="receipt-items" id="receiptItems">
+      <div style="text-align:center;padding:60px 20px;color:#ccc">
+        <div style="font-size:48px;margin-bottom:12px">🛒</div>
+        <div style="font-size:14px">No items scanned yet</div>
+        <div style="font-size:12px;margin-top:4px">Capture an image and tap SCAN</div>
+      </div>
+    </div>
+    <div class="totals" id="totalsSection" style="display:none">
+      <div class="row label"><span>Subtotal</span><span class="val" id="subtotalVal">$0.00</span></div>
+      <div class="row label"><span>Tax (10%)</span><span class="val" id="taxVal">$0.00</span></div>
+      <div class="row grand"><span class="lbl">TOTAL</span><span class="val" id="totalVal">$0.00</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="resetScan()">🔄 New Scan</button>
+      <button class="btn btn-scan" id="scanBtn" onclick="runScan()">🔍 SCAN</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- INVENTORY TAB -->
+<div class="tab-container" id="tab-inventory">
+  <div class="search-bar">
+    <input type="text" placeholder="Search products..." id="invSearch" oninput="filterProducts()">
+    <select id="catFilter" onchange="filterProducts()">
+      <option value="">All</option>
+      <option>Beverages</option><option>Dairy</option><option>Snacks</option>
+      <option>Pantry</option><option>Canned Goods</option><option>Condiments</option>
+      <option>Breakfast</option><option>Personal Care</option><option>Household</option>
+    </select>
+  </div>
+  <div class="product-list" id="productList"></div>
+  <button class="fab" onclick="alert('Bulk restock dialog would open here')">📦 Restock</button>
+</div>
+
+<!-- HISTORY TAB -->
+<div class="tab-container" id="tab-history">
+  <div style="padding:12px">
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+const PRODUCTS=[
+  {id:1,name:"Auer Cranberry Juice 1L",cat:"Beverages",price:3.49,stock:67},
+  {id:2,name:"Auer Apple Juice 1L",cat:"Beverages",price:3.29,stock:45},
+  {id:3,name:"Römerquelle Mineral Water 500ml",cat:"Beverages",price:1.29,stock:82},
+  {id:4,name:"NÖM Whole Milk 1L",cat:"Dairy",price:1.89,stock:38},
+  {id:5,name:"NÖM Natural Yogurt 200g",cat:"Dairy",price:0.99,stock:54},
+  {id:6,name:"Meggle Alpine Butter 250g",cat:"Dairy",price:2.99,stock:22},
+  {id:7,name:"Hanuta Wafer Snack 10-Pack",cat:"Snacks",price:3.99,stock:41},
+  {id:8,name:"Kinder Riegel Chocolate 10-Pack",cat:"Snacks",price:3.29,stock:0},
+  {id:9,name:"Reggia Fusilli Pasta 500g",cat:"Pantry",price:1.49,stock:73},
+  {id:10,name:"Heinz Tomato Ketchup 500ml",cat:"Condiments",price:3.49,stock:29},
+  {id:11,name:"Nutella Hazelnut Spread 400g",cat:"Breakfast",price:4.99,stock:17},
+  {id:12,name:"Pringles Original 165g",cat:"Snacks",price:2.99,stock:55},
+  {id:13,name:"Colgate Total Toothpaste 75ml",cat:"Personal Care",price:2.99,stock:8},
+  {id:14,name:"Persil Universal Gel 1L",cat:"Household",price:7.49,stock:33},
+  {id:15,name:"Mutti Peeled Tomatoes 400g",cat:"Canned Goods",price:1.99,stock:61},
+  {id:16,name:"Bonduelle Sweet Corn 340g",cat:"Canned Goods",price:1.79,stock:5},
+  {id:17,name:"Jacobs Krönung Coffee 500g",cat:"Beverages",price:7.99,stock:19},
+  {id:18,name:"Bertolli Olive Oil 500ml",cat:"Pantry",price:6.99,stock:26},
+  {id:19,name:"Head & Shoulders Shampoo 250ml",cat:"Personal Care",price:4.99,stock:3},
+  {id:20,name:"Fresh Gala Apple (each)",cat:"Fresh Produce",price:0.79,stock:90},
+];
+const COLORS=["#FF5722","#2196F3","#4CAF50","#FFC107","#9C27B0","#00BCD4","#FF5733","#3F51B5","#8BC34A","#FF9800"];
+const DEMO_ITEMS=[
+  {id:1,name:"Auer Cranberry Juice 1L",qty:2,price:3.49,conf:.94,color:"#FF5722"},
+  {id:4,name:"NÖM Whole Milk 1L",qty:1,price:1.89,conf:.91,color:"#2196F3"},
+  {id:12,name:"Pringles Original 165g",qty:3,price:2.99,conf:.87,color:"#4CAF50"},
+  {id:20,name:"Fresh Gala Apple (each)",qty:4,price:0.79,conf:.82,color:"#FFC107"},
+];
+let scanned=false;
+
+function showTab(t){
+  document.querySelectorAll('.tab-container').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='inventory')renderProducts();
+  if(t==='history')renderHistory();
+}
+
+function pickImage(){
+  const input=document.createElement('input');input.type='file';input.accept='image/*';
+  input.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=ev=>{
+      document.getElementById('previewImg').src=ev.target.result;
+      document.getElementById('previewImg').style.display='block';
+      document.getElementById('placeholder').style.display='none';
+    };r.readAsDataURL(f);
+  };input.click();
+}
+
+function loadDemo(){
+  document.getElementById('previewImg').src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect fill="%23222" width="800" height="600"/><text fill="%23666" font-family="Inter" font-size="20" x="400" y="280" text-anchor="middle">Demo Checkout Counter Image</text><text fill="%23444" font-family="Inter" font-size="14" x="400" y="310" text-anchor="middle">4 grocery items detected</text><rect x="50" y="100" width="180" height="250" rx="8" fill="none" stroke="%23FF5722" stroke-width="2" opacity=".5"/><rect x="280" y="150" width="150" height="200" rx="8" fill="none" stroke="%232196F3" stroke-width="2" opacity=".5"/><rect x="480" y="80" width="130" height="300" rx="8" fill="none" stroke="%234CAF50" stroke-width="2" opacity=".5"/><rect x="520" y="350" width="200" height="180" rx="8" fill="none" stroke="%23FFC107" stroke-width="2" opacity=".5"/><text fill="%23FF5722" font-size="11" x="55" y="95">Juice x2 94%</text><text fill="%232196F3" font-size="11" x="285" y="145">Milk x1 91%</text><text fill="%234CAF50" font-size="11" x="485" y="75">Pringles x3 87%</text><text fill="%23FFC107" font-size="11" x="525" y="345">Apple x4 82%</text></svg>');
+  document.getElementById('previewImg').style.display='block';
+  document.getElementById('placeholder').style.display='none';
+}
+
+function runScan(){
+  if(scanned)return;
+  const btn=document.getElementById('scanBtn');
+  btn.innerHTML='⏳ Analysing...';btn.disabled=true;
+  setTimeout(()=>{
+    scanned=true;
+    let html='';
+    DEMO_ITEMS.forEach((it,i)=>{
+      const sub=(it.qty*it.price).toFixed(2);
+      html+=`<div class="receipt-item" style="animation-delay:${i*.12}s">
+        <div class="dot" style="background:${it.color}"></div>
+        <div class="info"><div class="name">${it.name}</div>
+        <div class="meta">${it.qty} × $${it.price.toFixed(2)}</div>
+        <div class="conf">Confidence: ${(it.conf*100).toFixed(0)}%</div></div>
+        <div class="price">$${sub}</div></div>`;
+    });
+    document.getElementById('receiptItems').innerHTML=html;
+    const sub=DEMO_ITEMS.reduce((a,b)=>a+b.qty*b.price,0);
+    const tax=sub*.1;
+    document.getElementById('subtotalVal').textContent='$'+sub.toFixed(2);
+    document.getElementById('taxVal').textContent='$'+tax.toFixed(2);
+    document.getElementById('totalVal').textContent='$'+(sub+tax).toFixed(2);
+    document.getElementById('totalsSection').style.display='block';
+    document.getElementById('procTime').textContent='87ms';
+    btn.innerHTML='✅ COMPLETE SALE';btn.disabled=false;
+    btn.className='btn btn-complete';
+    btn.onclick=()=>alert('Sale completed! Transaction ID: a1b2c3d4');
+  },1500);
+}
+
+function resetScan(){
+  scanned=false;
+  document.getElementById('previewImg').style.display='none';
+  document.getElementById('placeholder').style.display='block';
+  document.getElementById('receiptItems').innerHTML='<div style="text-align:center;padding:60px 20px;color:#ccc"><div style="font-size:48px;margin-bottom:12px">🛒</div><div style="font-size:14px">No items scanned yet</div></div>';
+  document.getElementById('totalsSection').style.display='none';
+  document.getElementById('procTime').textContent='';
+  document.getElementById('overlayArea').innerHTML='';
+  const btn=document.getElementById('scanBtn');
+  btn.innerHTML='🔍 SCAN';btn.disabled=false;btn.className='btn btn-scan';btn.onclick=runScan;
+}
+
+function renderProducts(){
+  const q=(document.getElementById('invSearch').value||'').toLowerCase();
+  const c=document.getElementById('catFilter').value;
+  let html='';
+  PRODUCTS.filter(p=>(!q||p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q))&&(!c||p.cat===c))
+  .forEach(p=>{
+    const cls=p.stock>10?'stock-green':p.stock>0?'stock-amber':'stock-red';
+    html+=`<div class="product-card"><div class="stock-badge ${cls}">${p.stock}</div>
+    <div class="product-info"><div class="pname">${p.name}</div><div class="pcat">${p.cat}</div></div>
+    <div class="product-price">$${p.price.toFixed(2)}</div><span style="color:#ccc">✏️</span></div>`;
+  });
+  document.getElementById('productList').innerHTML=html;
+}
+function filterProducts(){renderProducts()}
+
+function renderHistory(){
+  const txns=[
+    {id:'A1B2C3D4',date:'Apr 29, 2026 05:45',total:18.92,tax:1.72,items:4,ms:87},
+    {id:'E5F6G7H8',date:'Apr 29, 2026 05:30',total:12.54,tax:1.14,items:3,ms:92},
+    {id:'I9J0K1L2',date:'Apr 28, 2026 18:15',total:25.30,tax:2.30,items:6,ms:103},
+  ];
+  let html='';
+  txns.forEach(t=>{
+    html+=`<div class="txn-card"><div class="txn-header">
+    <div class="txn-icon">🧾</div><div style="flex:1">
+    <div class="txn-amount">$${t.total.toFixed(2)}</div>
+    <div class="txn-meta">${t.date}<br><small>ID: ${t.id} • ${t.items} items • ${t.ms}ms</small></div>
+    </div></div></div>`;
+  });
+  document.getElementById('historyList').innerHTML=html||'<div style="text-align:center;padding:60px;color:#ccc">No transactions yet</div>';
+}
+</script>
+</body>
+</html>
